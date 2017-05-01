@@ -92,20 +92,15 @@ def next_poly_point(block, r, c, poly_points):
     while not it.finished:
         ir = it.multi_index[0]
         ic = it.multi_index[1]
-        if chunk[ir, ic] > 0:
+        if chunk[ir, ic] > 0 and [ir-1+r,ic-1+c] not in poly_points:
             scores[ir, ic] = get_score(chunk, ir, ic)
+        else:
+            scores[ir, ic] = 1000000
         it.iternext()
-    sorted_idx = scores.argsort()
-    x, y = np.where(scores == mm)
-    minargs = zip(x, y)
-    for minarg in minargs:
-        minarg = list(minarg)
-        minarg[0] = minarg[0] - 1 + r
-        minarg[1] = minarg[1] - 1 + c
-        if minarg not in poly_points:
-            return minarg
-    return [-1, -1]
-
+    p = list(np.unravel_index( np.argmin(scores), scores.shape))
+    p[0] = p[0] - 1 + r
+    p[1] = p[1] - 1 + c
+    return p
 
 def buid_polygon(block, num):
     # scan
